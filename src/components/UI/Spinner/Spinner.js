@@ -1,9 +1,9 @@
 import React from 'react';
 import { Spinner } from './Spinner.module.css';
 
+// Show this spinner when loading data
 const spinner = () => (
-  {/* Show this spinner when loading data */}
-  <div class={Spinner}></div>
+  <div className={Spinner}></div>
 );
 
 export default spinner

@@ -3,7 +3,6 @@ import YAML from 'yaml';
 import Chart from './components/Chart/Chart';
 import Spinner from './components/UI/Spinner/Spinner';
 import LastMeasurements from './components/LastMeasurements/LastMeasurements';
-// import classes from './App.module.css';
 
 class App extends Component {
   state = { data: {} }
@@ -24,19 +23,17 @@ class App extends Component {
     const { temperature, power } = data;
 
     return(
-        {/* Using Fragment for Adjacent JSX */}
+    // Using Fragment for Adjacent JSX
+    // checking if data has loaded, if not, display Spinner
       <Fragment>
-        {/* checking if data has loaded, if not, display Spinner */}
         {data.temperature ?
           <Fragment>
           {/* Chart */}
           <Chart temperature={temperature} power={power}/>
           {/* Last Measurements */}
           <LastMeasurements data={ data }/>
-          </Fragment> :
-          <Spinner/>
+          </Fragment> : <Spinner/>
         }
-
       </Fragment>
     );
   }
