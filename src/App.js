@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import YAML from 'yaml';
 import Chart from './components/Chart/Chart';
 import Spinner from './components/UI/Spinner/Spinner';
@@ -21,13 +21,23 @@ class App extends Component {
 
   render() {
     const { data } = this.state;
+    const { temperature, power } = data;
+
     return(
-      <div>
-        {/* checking if data has loaded, if not, display Spinner/spinner */}
-        {data.temperature ? <Chart temperature={data.temperature} power={data.power}/> : <Spinner/>}
-        {/* Last Measurements */}
-        {data.temperature ? <LastMeasurements data={ data }/> : <Spinner /> }
-      </div>
+        {/* Using Fragment for Adjacent JSX */}
+      <Fragment>
+        {/* checking if data has loaded, if not, display Spinner */}
+        {data.temperature ?
+          <Fragment>
+          {/* Chart */}
+          <Chart temperature={temperature} power={power}/>
+          {/* Last Measurements */}
+          <LastMeasurements data={ data }/>
+          </Fragment> :
+          <Spinner/>
+        }
+
+      </Fragment>
     );
   }
 }

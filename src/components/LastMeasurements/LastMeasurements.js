@@ -3,10 +3,13 @@ import LastMeasurement from './LastMeasurement/LastMeasurement';
 import { Measurements } from './LastMeasurements.module.css';
 
 const lastMeasurements = ({ data }) => {
+  const { power, temperature } = data;
+
   return (
     <div className={ Measurements }>
-      <LastMeasurement data={ data.power }/>
-      <LastMeasurement data={ data.temperature }/>
+      {/* instances of the last measurements for power/temperature */}
+      <LastMeasurement data={ power }/>
+      <LastMeasurement data={ temperature }/>
     </div>
     );
 }
