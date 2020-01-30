@@ -1,3 +1,15 @@
+To run this Project on Local Dev server:
+
+### `yarn install` or ### `npm install`
+
+and 
+
+### `yarn start` or ### `npm start`
+
+
+---------------------------------------------------------------------------------------------------
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
