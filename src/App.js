@@ -17,8 +17,7 @@ class App extends Component {
     tempXAxis: [],
     powAvgs: [],
     powXAxis: [],
-    // amount of records before current time we want to read, each
-    // record represents a 5 second span, 12 records being 1 minute
+    // amount of records we want to read
     dataRecords: 80
     }
 
