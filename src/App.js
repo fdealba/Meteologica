@@ -4,7 +4,7 @@ import React, { Component, Fragment } from 'react';
 import YAML from 'yaml';
 
 // Components
-import Chart from './components/Chart/Chart';
+import Charts from './components/Charts/Charts';
 import Spinner from './components/UI/Spinner/Spinner';
 import LastMeasurements from './components/LastMeasurements/LastMeasurements';
 
@@ -14,9 +14,13 @@ class App extends Component {
     lastTemp: null,
     lastPow: null,
     tempAvgs: [],
+    tempXAxis: [],
     powAvgs: [],
-    times: [],
-  }
+    powXAxis: [],
+    // amount of records before current time we want to read, each
+    // record represents a 5 second span, 12 records being 1 minute
+    dataRecords: 80
+    }
 
   componentDidMount() {
     this.readYAML('data.yml');
@@ -40,66 +44,120 @@ class App extends Component {
     setTime = () => {
     const date = new Date();
     // Get hours, minutes and seconds from date
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
 
     // round seconds to the nearest 5
     let seconds = date.getSeconds();
-    seconds = Math.ceil(seconds / 5) * 5
-
+    if (seconds !== 0) seconds = Math.ceil(seconds / 5) * 5;
+    if (seconds === 60) {
+      seconds = 0;
+      minutes += 1;
+    }
+    
     // add a 0 behind if less than 10
     const time = `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-
     this.setData(time);
   }
 
   setData = (timenow) => {
+
     // Destructuring the data from state, and setting a variable for temperature data and power data.
-    const { data } = this.state;
+    const { data, dataRecords } = this.state;
     const tempData = [...data.temperature.values];
     const powData = [...data.power.values];
 
     // Find index of time now in temperature dataset
-    const tempIndex = tempData.findIndex(dataSet => {
+    let tempIndex = tempData.findIndex(dataSet => {
       return dataSet.time === timenow
     });
 
+    // if the index is undefined, execute a undefined handler for the Dataset to set index
+    // to the most recent valid value previus to this one
+    if (tempIndex == -1) tempIndex = this.handleUndefined(tempData);
+
     // Find Index of time now in power dataset
-    const powerIndex = powData.findIndex(dataSet => {
+    let powerIndex = powData.findIndex(dataSet => {
       return dataSet.time === timenow
     })
 
+    // if the index is undefined, execute a undefined handler for the Dataset to set index
+    // to the most recent valid value previus to this one
+    if (powerIndex == -1) powerIndex = this.handleUndefined(powData);
+
+
     // Extract 80 values the datasets
-    const newTempData = tempData.slice(tempIndex - 80, tempIndex);
-    const newPowData = powData.slice(powerIndex - 80, powerIndex);
+    const newTempData = tempData.slice(tempIndex - dataRecords, tempIndex);
+    const newPowData = powData.slice(powerIndex - dataRecords, powerIndex);
 
     // Pass the filtered data to a data handler
     this.handleData(newTempData, newPowData);
   }
 
+  handleUndefined = (data) => {
+    let time = new Date();
+    let lastIndex = null;
+
+    // Search for the last valid value index to put in the graph before the undefined
+    while (!lastIndex) {
+      // removing 5 seconds from time until finding a valid value
+      time = time - 5000;
+      let newTime = new Date(time);
+      let seconds = newTime.getSeconds();
+      let minutes = newTime.getMinutes();
+      let hours = newTime.getHours();
+
+      //round seconds to nearest 5
+      if (seconds !== 0) seconds = Math.ceil(seconds / 5) * 5;
+      if (seconds === 60) {
+        seconds = 0;
+        minutes += 1;
+      }
+
+      // format time in order to be compareable with obj.time
+      const formatedTime = `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`
+      
+      const found = data.findIndex(obj => {
+        return obj.time == formatedTime
+      })
+      // if value is found, set it equal to last index, if not, keep looping
+      if (found > 1) lastIndex = found;
+    }
+    //Return last valid Index
+    return lastIndex;
+  }
+
 
 
   handleData = (tempData, powData) => {
+    const { dataRecords } = this.state;
     // Calculate temperature averages for every minute
     const tempAvgs = this.setTemperatureAvgs(tempData);
     // Calculate power averages for every minute
     const powAvgs = this.setPowerAvgs(powData);
+
     // Get time for given data to put in the X axis of the chart
-    const timeX = this.setXAxis(powData);
+    const tempXAxis = this.setXAxis(tempData);
+    const powXAxis = this.setXAxis(powData);
 
     // Get last temperature/power values to pass into last measurements components
     const temp = tempData.pop();
     const power = powData.pop();
     const lastTemp = (temp.value/10 - 273.15).toFixed(2);
-    const lastPow = (parseFloat(power.value) * 1000).toFixed(0);
+    const lastPow = (parseFloat(power.value.replace(',', '.')) * 1000).toFixed(0);
 
     // Save all the relevant data in state, to pass into components later on
-    this.setState({
-      powAvgs: powAvgs,
-      tempAvgs: tempAvgs,
-      times: timeX,
-      lastTemp: lastTemp,
-      lastPow: lastPow
+    this.setState(state => {
+      const newDataRecords = dataRecords + 1;
+      return {
+        powAvgs: powAvgs,
+        powXAxis: powXAxis,
+        tempAvgs: tempAvgs,
+        tempXAxis: tempXAxis,
+        lastTemp: lastTemp,
+        lastPow: lastPow,
+        dataRecords: newDataRecords
+      };
     })
   }
 
@@ -112,7 +170,7 @@ class App extends Component {
       // Check if its a round minute
       if (obj.time.endsWith('00')) {
       // store 12 elements before it in an array
-        const minuteArray = tempData.slice(index - 12, index);
+        const minuteArray = tempData.slice(index - 13, index);
       // Calculate the sum of every value of the array of Objects
         const tempSum = minuteArray.reduce((acc, obj) => {
           return acc + (obj.value/10 - 273.15);
@@ -136,10 +194,10 @@ class App extends Component {
       // Check if its a round minute
       if (obj.time.endsWith('00')) {
         // store 12 elements before it in an array
-        const newArray = powData.slice(index - 12, index);
+        const newArray = powData.slice(index - 13, index);
         // Calculate the sum of every value of the array of Objects
         const powerSum = newArray.reduce((acc, obj) => {
-          return acc + parseFloat(obj.value) * 1000
+          return acc + parseFloat(obj.value.replace(',', '.')) * 1000
         }, 0);
         // divide the sum by the array length to get the average
         const average = powerSum/newArray.length;
@@ -151,10 +209,10 @@ class App extends Component {
     return powAvgs;
   }
 
-  setXAxis = (powData) => {
+  setXAxis = (data) => {
     let timeValues = [];
     // Iterate over every dataset
-    powData.forEach((obj) => {
+    data.forEach((obj) => {
     // Check if its a round minute
       if (obj.time.endsWith('00')) {
       // push the time values into an array created beforehand
@@ -169,24 +227,22 @@ class App extends Component {
 
   render() {
     // destructuring state to avoid chunks of code
-    const { lastTemp, lastPow, powAvgs, tempAvgs, times } = this.state;
+    const { lastTemp, lastPow, powAvgs, tempAvgs, powXAxis, tempXAxis } = this.state;
     return(
     // Using Fragment for Adjacent JSX
     // Checking if last values 'lastTemp && lastPow' exist yet, if not, display Spinner
       <Fragment>
         { lastTemp && lastPow ?
           <Fragment>
-          {/* Chart */}
-            <div>
-              <Chart tempData={tempAvgs} time={times} />
-              <Chart powData={powAvgs} time={times} />
-            </div>
+          {/* Charts */}
+              <Charts temperature={tempAvgs} power={powAvgs} powXAxis={powXAxis} tempXAxis={tempXAxis} />
           {/* Last Measurements */}
             <LastMeasurements temperature={lastTemp} power={lastPow}/>
-          </Fragment> : <Spinner/>
+          </Fragment> : <Spinner/> 
+          
         }
       </Fragment>
-    );
+    );  
   }
 }
 

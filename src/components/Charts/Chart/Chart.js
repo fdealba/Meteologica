@@ -1,41 +1,36 @@
-import React, { Component } from 'react';
-// classes from css module for the clases to be unique
-import classes from './Chart.module.css';
+import React from 'react';
 //Plotly for graph
 import Plot from 'react-plotly.js';
 
-class Chart extends Component {
-
-  render() {
-    //destructuring props
-  	const { tempData, powData, time } = this.props;
-    let chart = null;
+const chart = ({tempData, powData, time}) => {
+  let chart = null;
     // if temp is present, then its a temperature chart, if not, a power chart.
-    if (tempData) {
+  if (tempData) {
       chart = (
         <Plot
-        className={classes.Chart}
         data={[
           {
             x: time,
             y: tempData,
             type: 'scatter',
             mode: 'lines+markers',
-            marker: {color: 'green', size: 5},
+            marker: {color: 'blue', size: 8},
             line: {
-              color: 'red',
+              color: 'blue',
               width: 1
             },
           }
         ]}
         layout={
-          { width: '50%',
-            height: '50%',
+          { 
+            width: 600,
+            height: 350,
             title: 'Temperature',
             xaxis: {
               type: 'date',
-              title: 'Time'
+              title: 'Time (Minutes)'
             },
+            paper_bgcolor: 'rgb(255, 255, 255)',
             yaxis: {
               title: 'Temperature (ºC)'
             }
@@ -46,14 +41,13 @@ class Chart extends Component {
     } else {
         chart = (
         <Plot
-        className={classes.Chart}
         data={[
           {
             x: time,
             y: powData,
             type: 'scatter',
             mode: 'lines+markers',
-            marker: {color: 'green', size: 5},
+            marker: {color: 'red', size: 8},
             line: {
               color: 'red',
               width: 1
@@ -61,13 +55,14 @@ class Chart extends Component {
           }
         ]}
         layout={
-          { width: '50%',
-            height: '50%',
+          { width: 600,
+            height: 350,
             title: 'Power Output',
             xaxis: {
               type: 'date',
-              title: 'time'
+              title: 'Time (Minutes)'
             },
+            paper_bgcolor: 'rgb(255, 255, 255)',
             yaxis: {
               title: 'Power Output (kWh)'
             }
@@ -77,7 +72,7 @@ class Chart extends Component {
     );
     }
     return chart;
-  }
+  
 }
 
-export default Chart;
+export default chart;
