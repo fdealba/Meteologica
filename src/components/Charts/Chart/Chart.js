@@ -22,8 +22,8 @@ const chart = ({tempData, powData, time}) => {
           }
         ]}
         layout={
-          { 
-            width: 600,
+          {
+            width: '100%',
             height: 350,
             title: 'Temperature',
             xaxis: {
@@ -55,7 +55,7 @@ const chart = ({tempData, powData, time}) => {
           }
         ]}
         layout={
-          { width: 600,
+          { width: '100%',
             height: 350,
             title: 'Power Output',
             xaxis: {
@@ -64,7 +64,7 @@ const chart = ({tempData, powData, time}) => {
             },
             paper_bgcolor: 'rgb(255, 255, 255)',
             yaxis: {
-              title: 'Power Output (kWh)'
+              title: 'Power Output (kW)'
             }
           }
         }
@@ -72,7 +72,7 @@ const chart = ({tempData, powData, time}) => {
     );
     }
     return chart;
-  
+
 }
 
 export default chart;
