@@ -9,6 +9,7 @@ and
 Como la temperatura se encuentra en intervalos minutuales y en promedios, en vez de representar la energia
 por hora, decidi mostrar por otro grafico las potencias recibidas en KiloWatts, intervalos por minuto, tomando la
 media por cada minuto.
+Si no encuentra datos, el grafico mostrara el ultimo dato valido pasado con la hora correspondiente.
 ---------------------------------------------------------------------------------------------------
 
 
