@@ -1,12 +1,14 @@
 To run this Project on Local Dev server:
 
-### `yarn install` or ### `npm install`
+### `yarn install` or `npm install`
 
-and 
+and
 
-### `yarn start` or ### `npm start`
+### `yarn start` or `npm start`
 
-
+Como la temperatura se encuentra en intervalos minutuales y en promedios, en vez de representar la energia
+por hora, decidi mostrar por otro grafico las potencias recibidas en KiloWatts, intervalos por minuto, tomando la
+media por cada minuto.
 ---------------------------------------------------------------------------------------------------
 
 
