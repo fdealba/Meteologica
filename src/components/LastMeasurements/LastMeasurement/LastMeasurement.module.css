@@ -7,7 +7,7 @@
   border-radius: 15px;
   color: rgb(133, 133, 133);
   padding: 20px 30px;
-  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.2);
 }
 
 .Measurement span {
