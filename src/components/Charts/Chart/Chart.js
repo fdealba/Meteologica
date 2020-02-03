@@ -23,7 +23,7 @@ const chart = ({ tempData, powData, time }) => {
         ]}
         layout={
           {
-            width: '100%',
+            width: 600,
             height: 350,
             title: 'Temperature',
             xaxis: {
@@ -56,7 +56,7 @@ const chart = ({ tempData, powData, time }) => {
         ]}
         layout={
           {
-            width: '100%',
+            width: 600,
             height: 350,
             title: 'Power Output',
             xaxis: {
